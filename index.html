@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kỷ niệm 15 năm</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #fff7e6, #fce4ec);
+  color: #4a2630;
+  text-align: center;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 650px;
+  margin: auto;
+  padding: 25px 16px 40px;
+}
+
+h1 {
+  font-size: 38px;
+  margin: 10px 0 5px;
+  color: #9b4055;
+}
+
+.subtitle {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.upload {
+  display: inline-block;
+  background: #9b4055;
+  color: white;
+  padding: 14px 22px;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.upload input {
+  display: none;
+}
+
+canvas {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  border-radius: 18px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.18);
+  background: white;
+}
+
+.controls {
+  margin-top: 20px;
+}
+
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 13px 20px;
+  margin: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.download {
+  background: #9b4055;
+  color: white;
+}
+
+.reset {
+  background: white;
+  color: #9b4055;
+  border: 1px solid #9b4055;
+}
+
+.note {
+  margin-top: 18px;
+  font-size: 14px;
+  opacity: 0.75;
+  line-height: 1.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>❤️ KỶ NIỆM 15 NĂM ❤️</h1>
+
+  <div class="subtitle">
+    Một chặng đường – Một tình yêu – Một kỷ niệm
+  </div>
+
+  <label class="upload">
+    📷 Chọn ảnh của bạn
+    <input type="file" id="photoInput" accept="image/*">
+  </label>
+
+  <canvas id="canvas" width="1080" height="1080"></canvas>
+
+  <div class="controls">
+    <button class="download" onclick="downloadImage()">
+      ⬇️ Lưu ảnh kỷ niệm
+    </button>
+
+    <button class="reset" onclick="resetImage()">
+      🔄 Đổi ảnh
+    </button>
+  </div>
+
+  <div class="note">
+    Chọn một bức ảnh từ điện thoại của bạn.<br>
+    Ảnh sẽ được đặt vào khung kỷ niệm 15 năm.
+  </div>
+
+</div>
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const input = document.getElementById("photoInput");
+
+let image = null;
+
+function drawFrame() {
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  /* Nền */
+  const gradient = ctx.createLinearGradient(0, 0, 1080, 1080);
+  gradient.addColorStop(0, "#fffaf0");
+  gradient.addColorStop(1, "#f8dce3");
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  /* Khung ảnh */
+  ctx.strokeStyle = "#9b4055";
+  ctx.lineWidth = 25;
+  ctx.strokeRect(35, 35, 1010, 1010);
+
+  ctx.strokeStyle = "#d49a63";
+  ctx.lineWidth = 8;
+  ctx.strokeRect(58, 58, 964, 964);
+
+  /* Ảnh */
+  if (image) {
+
+    const x = 110;
+    const y = 150;
+    const w = 860;
+    const h = 650;
+
+    const scale = Math.max(
+      w / image.width,
+      h / image.height
+    );
+
+    const iw = image.width * scale;
+    const ih = image.height * scale;
+
+    const ix = x + (w - iw) / 2;
+    const iy = y + (h - ih) / 2;
+
+    ctx.save();
+
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 25);
+    ctx.clip();
+
+    ctx.drawImage(image, ix, iy, iw, ih);
+
+    ctx.restore();
+
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 12;
+    ctx.strokeRect(x, y, w, h);
+  }
+
+  /* Tiêu đề */
+  ctx.fillStyle = "#7d3045";
+  ctx.textAlign = "center";
+
+  ctx.font = "bold 62px Arial";
+  ctx.fillText("15 NĂM KỶ NIỆM", 540, 885);
+
+  ctx.font = "34px Arial";
+  ctx.fillStyle = "#9b4055";
+  ctx.fillText("Cùng nhau viết tiếp những năm tháng đẹp nhất", 540, 945);
+
+  /* Trang trí */
+  ctx.font = "48px Arial";
+  ctx.fillText("♥", 100, 930);
+  ctx.fillText("♥", 980, 930);
+}
+
+input.addEventListener("change", function(e) {
+
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(event) {
+
+    image = new Image();
+
+    image.onload = function() {
+      drawFrame();
+    };
+
+    image.src = event.target.result;
+  };
+
+  reader.readAsDataURL(file);
+});
+
+function downloadImage() {
+
+  const link = document.createElement("a");
+
+  link.download = "ky-niem-15-nam.png";
+
+  link.href = canvas.toDataURL("image/png");
+
+  link.click();
+}
+
+function resetImage() {
+
+  image = null;
+  input.value = "";
+  drawFrame();
+}
+
+drawFrame();
+
+</script>
+
+</body>
+</html>
